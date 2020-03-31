@@ -1,0 +1,125 @@
+21c21,26
+< #define MIB_VERSION				6
+---
+> #ifdef __ECOS
+> #include <pkgconf/system.h>
+> #include <pkgconf/devs_eth_rltk_819x_wlan.h>
+> #endif
+> 
+> #define MIB_VERSION				15
+31a37,40
+> 
+> #ifdef __ECOS
+> #define NUM_WDS					RTLPKG_DEVS_ETH_RLTK_819X_WLAN_WDS_NUM
+> #else
+42a52
+> #endif
+75c85,86
+< 	int				olbcDetectDisabled;		// david, force disable olbc dection
+---
+> 	int				olbcDetectDisabled;		// david, force disable olbc dection	
+> 	int				nmlscDetectDisabled;		// hf, force disable no member legacy station condition detection
+95c106
+< 	unsigned int	dot11PrivacyAlgrthm;	// encryption algorithm, could be none, wep40, TKIP, CCMP, wep104
+---
+> 	unsigned char	dot11PrivacyAlgrthm;	// encryption algorithm, could be none, wep40, TKIP, CCMP, wep104
+109a121,123
+> 	unsigned int	acct_enabled;
+> 	unsigned long	acct_timeout_period;
+> 	unsigned int	acct_timeout_throughput;
+229c243
+< 	unsigned int	dot11channel;
+---
+> 	unsigned char	dot11channel;
+248a263
+> 	unsigned int	disable_ch1213;
+256,257c271,272
+< 	unsigned int	phyBandSelect;
+< 	unsigned int	macPhyMode;
+---
+> 	unsigned char	phyBandSelect;
+> 	unsigned char	macPhyMode;
+260d274
+< #ifdef PHASE2_TEST
+262d275
+< #endif
+264a278
+> 	unsigned int	tx2path;
+296a311,315
+> 	/*add for P2P_SUPPORT ; for sync; it exist no matter p2p enabled or not*/
+> 	unsigned char	p2pdevname[33];
+> 	unsigned char	p2prole;
+> 	unsigned short	p2pwscconfig;
+> 	unsigned char	p2paddress[MACADDRLEN];
+315c334
+< 	unsigned char macAddr [MACADDRLEN] __attribute__ ((packed));
+---
+> 	unsigned char macAddr [MACADDRLEN];
+371a391
+> 	unsigned int	use_txq;
+389a410,413
+> 	unsigned int	UAPSD_AC_BE;
+> 	unsigned int	UAPSD_AC_BK;
+> 	unsigned int	UAPSD_AC_VI;
+> 	unsigned int	UAPSD_AC_VO;
+414c438
+< 	unsigned int	GBWCMode;		// 0: disable 1: inner limitation 2: outer limitation
+---
+> 	unsigned int	GBWCMode;		// 0: disable 1: inner limitation 2: outer limitation 3: tx interface 4: rx interface 5: tx+rx interface
+417c441,442
+< 	unsigned int	GBWCThrd;		// Threshold, in unit of kbps
+---
+> 	unsigned int	GBWCThrd_tx;		// Tx Threshold, in unit of kbps
+> 	unsigned int	GBWCThrd_rx;		// Rx Threshold, in unit of kbps	
+427a453
+> 	unsigned int	dot11nLDPC;	
+435a462
+> 	unsigned int	dot11nTxNoAck;
+489d515
+< #if defined(CONFIG_RTK_VLAN_NEW_FEATURE)
+491,492d516
+< #endif
+< 
+543a568,606
+> /*for P2P_SUPPORT*/
+> struct P2P_Direct {
+> 
+> 	unsigned int   p2p_type;
+> 	unsigned int   p2p_state;
+> 	unsigned int   p2p_on_discovery;
+> 	unsigned char  p2p_intent;
+> 	unsigned char  p2p_listen_channel;
+> 	unsigned char  p2p_op_channel;
+> 
+> 	unsigned char  p2p_event_indiate;
+> 
+> 	unsigned char  p2p_device_name[33];
+> 	unsigned char  p2p_wsc_pin_code[9];
+> 	unsigned short p2p_wsc_config_method;
+> 
+> };
+> 
+> #define PROFILE_NUM		5 	// must reserve one for root profile. 
+> 
+> struct ap_profile {
+> 	char ssid[33];		// desired SSID in string
+> 	int	encryption;		// 0: open, 1:wep40, 2:wep128, 3:wpa, 4:wpa2
+> 	int	auth_type;		// authentication type. 0: open, 1: shared, 2: auto
+> 	int	wpa_cipher;		// bit0-wep64, bit1-tkip, bit2-wrap,bit3-ccmp, bit4-wep128
+> 	unsigned char wpa_psk[65]; // wpa psk
+> 	int	wep_default_key;	  // wep default tx key index, 0~3
+> 	unsigned char wep_key1[13]; // WEP key1 in hex
+> 	unsigned char wep_key2[13]; // WEP key2 in hex
+> 	unsigned char wep_key3[13]; // WEP key3 in hex
+> 	unsigned char wep_key4[13]; // WEP key4 in hex	
+> };
+> 
+> struct ap_conn_profile { // ap connection profile
+> 	int	enable_profile;
+> 	int	profile_num;		// profile number, except root profile.
+> 	struct ap_profile profile[PROFILE_NUM];
+> };
+> 
+573a637,638
+> 	struct P2P_Direct			p2p_mib;	// add for P2P_SUPPORT
+> 	struct ap_conn_profile			ap_profile;		

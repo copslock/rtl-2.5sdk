@@ -1,0 +1,277 @@
+Index: .config.old
+===================================================================
+--- .config.old	(revision 21164)
++++ .config.old	(working copy)
+@@ -6,16 +6,16 @@
+ # Target Platform Selection
+ #
+ # CONFIG_RTL8196B is not set
+-# CONFIG_RTL8196C is not set
+-CONFIG_RTL8198_=y
++CONFIG_RTL8196C=y
++# CONFIG_RTL8198_ is not set
+ # CONFIG_RTL89xxC is not set
+ RTL8196=y
+-RTL8198=y
+-CONFIG_RTL8198_REVISION_B=y
+-CONFIG_RTL8198=y
++RTL8196B=y
++RTL8196C=y
++CONFIG_RTL8196C_REVISION_B=y
+ # CONFIG_D8_16 is not set
+-# CONFIG_D16_16 is not set
+-CONFIG_D32_16=y
++CONFIG_D16_16=y
++# CONFIG_D32_16 is not set
+ # CONFIG_D64_16 is not set
+ # CONFIG_D128_16 is not set
+ # CONFIG_D8_16x2 is not set
+Index: boot/include/linux/autoconf2.h
+===================================================================
+--- boot/include/linux/autoconf2.h	(revision 21164)
++++ boot/include/linux/autoconf2.h	(working copy)
+@@ -15,8 +15,8 @@
+ #define RTL8196C 1
+ #define CONFIG_RTL8196C_REVISION_B 1
+ #undef  CONFIG_D8_16
+-#define CONFIG_D16_16 1
+-#undef  CONFIG_D32_16
++#undef  CONFIG_D16_16
++#define CONFIG_D32_16 1
+ #undef  CONFIG_D64_16
+ #undef  CONFIG_D128_16
+ #undef  CONFIG_D8_16x2
+Index: boot/monitor/power_on_led.c
+===================================================================
+--- boot/monitor/power_on_led.c	(revision 21164)
++++ boot/monitor/power_on_led.c	(working copy)
+@@ -409,6 +409,19 @@
+ 
+ }
+ 
++void power_on_sys_power_led(void)
++{
++	
++	int val32;
++	val32 = *(volatile unsigned int *)0xb8000040;
++	*(volatile unsigned int *)0xb8000040 = val32 | (3 << 20) | (3 << 18);
++	val32 = *(volatile unsigned int *)0xb8003500;
++	*(volatile unsigned int *)0xb8003500 = val32 & ~((1 << 6) | (1 << 1));
++	val32 = *(volatile unsigned int *)0xb8003508;
++	*(volatile unsigned int *)0xb8003508 = val32 | ((1 << 6) | (1 << 1));
++	val32 = *(volatile unsigned int *)0xb800350C;
++	*(volatile unsigned int *)0xb800350C = val32 & ~((1 << 6) | (1 << 1));
++}
+ 
+ void power_on_led(void)
+ {
+@@ -420,5 +433,5 @@
+ 	PCIE_Host_Init(2, arg_v);
+ 	reg = (REG32(PCIE0_EP_CFG_BASE + 0x18) & 0xffff0000) | 0xb0000000;
+ 	DBG_PRINT("PCIe config base reg 0x%08x\n", reg);
+-	(*(volatile u32 *)(reg + 0x4c)) = ((*(volatile u32 *)(reg + 0x4c)) & 0xFF00FFFF) | 0x00600000;
++	(*(volatile u32 *)(reg + 0x4c)) = ((*(volatile u32 *)(reg + 0x4c)) & 0xFF00FFFF) | 0x00200000;
+ }
+Index: boot/init/main.c
+===================================================================
+--- boot/init/main.c	(revision 21164)
++++ boot/init/main.c	(working copy)
+@@ -58,6 +58,7 @@
+ 
+ 	showBoardInfo();
+ 	power_on_led();
++	power_on_sys_power_led();
+ 	return_addr=0;
+ 	ret=check_image	(&header,&setting_header);
+ 
+Index: boot/banner/mk_time
+===================================================================
+--- boot/banner/mk_time	(revision 21164)
++++ boot/banner/mk_time	(working copy)
+@@ -1 +1 @@
+-#define BOOT_CODE_TIME "2011.10.25-01:10+0800"
++#define BOOT_CODE_TIME "2013.07.15-12:48+0800"
+Index: .config
+===================================================================
+--- .config	(revision 21164)
++++ .config	(working copy)
+@@ -14,8 +14,8 @@
+ RTL8196C=y
+ CONFIG_RTL8196C_REVISION_B=y
+ # CONFIG_D8_16 is not set
+-CONFIG_D16_16=y
+-# CONFIG_D32_16 is not set
++# CONFIG_D16_16 is not set
++CONFIG_D32_16=y
+ # CONFIG_D64_16 is not set
+ # CONFIG_D128_16 is not set
+ # CONFIG_D8_16x2 is not set
+Index: autoconf.h
+===================================================================
+--- autoconf.h	(revision 21164)
++++ autoconf.h	(working copy)
+@@ -15,8 +15,8 @@
+ #define RTL8196C 1
+ #define CONFIG_RTL8196C_REVISION_B 1
+ #undef  CONFIG_D8_16
+-#define CONFIG_D16_16 1
+-#undef  CONFIG_D32_16
++#undef  CONFIG_D16_16
++#define CONFIG_D32_16 1
+ #undef  CONFIG_D64_16
+ #undef  CONFIG_D128_16
+ #undef  CONFIG_D8_16x2
+Index: config.in.old
+===================================================================
+--- config.in.old	(revision 21164)
++++ config.in.old	(working copy)
+@@ -73,7 +73,7 @@
+ Dram16M_16Mx1_16bit  CONFIG_D16_16 \
+ Dram32M_32Mx1_16bit  CONFIG_D32_16 \
+ Dram64M_64Mx1_16bit  CONFIG_D64_16 \
+-Dram64M_128Mx1_16bit  CONFIG_D128_16 \
++Dram128M_128Mx1_16bit  CONFIG_D128_16 \
+ Dram16M_8Mx2_16bit  CONFIG_D8_16x2 \
+ Dram32M_16Mx2_16bit  CONFIG_D16_16x2 \
+ Dram64M_32Mx2_16bit  CONFIG_D32_16x2 \
+Index: boot_sdk2.5_719.patch
+===================================================================
+--- boot_sdk2.5_719.patch	(revision 0)
++++ boot_sdk2.5_719.patch	(revision 0)
+@@ -0,0 +1,136 @@
++Index: .config.old
++===================================================================
++--- .config.old	(revision 21164)
+++++ .config.old	(working copy)
++@@ -6,16 +6,16 @@
++ # Target Platform Selection
++ #
++ # CONFIG_RTL8196B is not set
++-# CONFIG_RTL8196C is not set
++-CONFIG_RTL8198_=y
+++CONFIG_RTL8196C=y
+++# CONFIG_RTL8198_ is not set
++ # CONFIG_RTL89xxC is not set
++ RTL8196=y
++-RTL8198=y
++-CONFIG_RTL8198_REVISION_B=y
++-CONFIG_RTL8198=y
+++RTL8196B=y
+++RTL8196C=y
+++CONFIG_RTL8196C_REVISION_B=y
++ # CONFIG_D8_16 is not set
++-# CONFIG_D16_16 is not set
++-CONFIG_D32_16=y
+++CONFIG_D16_16=y
+++# CONFIG_D32_16 is not set
++ # CONFIG_D64_16 is not set
++ # CONFIG_D128_16 is not set
++ # CONFIG_D8_16x2 is not set
++Index: boot/include/linux/autoconf2.h
++===================================================================
++--- boot/include/linux/autoconf2.h	(revision 21164)
+++++ boot/include/linux/autoconf2.h	(working copy)
++@@ -15,8 +15,8 @@
++ #define RTL8196C 1
++ #define CONFIG_RTL8196C_REVISION_B 1
++ #undef  CONFIG_D8_16
++-#define CONFIG_D16_16 1
++-#undef  CONFIG_D32_16
+++#undef  CONFIG_D16_16
+++#define CONFIG_D32_16 1
++ #undef  CONFIG_D64_16
++ #undef  CONFIG_D128_16
++ #undef  CONFIG_D8_16x2
++Index: boot/monitor/power_on_led.c
++===================================================================
++--- boot/monitor/power_on_led.c	(revision 21164)
+++++ boot/monitor/power_on_led.c	(working copy)
++@@ -409,6 +409,19 @@
++ 
++ }
++ 
+++void power_on_sys_power_led(void)
+++{
+++	
+++	int val32;
+++	val32 = *(volatile unsigned int *)0xb8000040;
+++	*(volatile unsigned int *)0xb8000040 = val32 | (3 << 20) | (3 << 18);
+++	val32 = *(volatile unsigned int *)0xb8003500;
+++	*(volatile unsigned int *)0xb8003500 = val32 & ~((1 << 6) | (1 << 1));
+++	val32 = *(volatile unsigned int *)0xb8003508;
+++	*(volatile unsigned int *)0xb8003508 = val32 | ((1 << 6) | (1 << 1));
+++	val32 = *(volatile unsigned int *)0xb800350C;
+++	*(volatile unsigned int *)0xb800350C = val32 & ~((1 << 6) | (1 << 1));
+++}
++ 
++ void power_on_led(void)
++ {
++@@ -420,5 +433,5 @@
++ 	PCIE_Host_Init(2, arg_v);
++ 	reg = (REG32(PCIE0_EP_CFG_BASE + 0x18) & 0xffff0000) | 0xb0000000;
++ 	DBG_PRINT("PCIe config base reg 0x%08x\n", reg);
++-	(*(volatile u32 *)(reg + 0x4c)) = ((*(volatile u32 *)(reg + 0x4c)) & 0xFF00FFFF) | 0x00600000;
+++	(*(volatile u32 *)(reg + 0x4c)) = ((*(volatile u32 *)(reg + 0x4c)) & 0xFF00FFFF) | 0x00200000;
++ }
++Index: boot/init/main.c
++===================================================================
++--- boot/init/main.c	(revision 21164)
+++++ boot/init/main.c	(working copy)
++@@ -58,6 +58,7 @@
++ 
++ 	showBoardInfo();
++ 	power_on_led();
+++	power_on_sys_power_led();
++ 	return_addr=0;
++ 	ret=check_image	(&header,&setting_header);
++ 
++Index: boot/banner/mk_time
++===================================================================
++--- boot/banner/mk_time	(revision 21164)
+++++ boot/banner/mk_time	(working copy)
++@@ -1 +1 @@
++-#define BOOT_CODE_TIME "2011.10.25-01:10+0800"
+++#define BOOT_CODE_TIME "2013.07.15-12:48+0800"
++Index: .config
++===================================================================
++--- .config	(revision 21164)
+++++ .config	(working copy)
++@@ -14,8 +14,8 @@
++ RTL8196C=y
++ CONFIG_RTL8196C_REVISION_B=y
++ # CONFIG_D8_16 is not set
++-CONFIG_D16_16=y
++-# CONFIG_D32_16 is not set
+++# CONFIG_D16_16 is not set
+++CONFIG_D32_16=y
++ # CONFIG_D64_16 is not set
++ # CONFIG_D128_16 is not set
++ # CONFIG_D8_16x2 is not set
++Index: autoconf.h
++===================================================================
++--- autoconf.h	(revision 21164)
+++++ autoconf.h	(working copy)
++@@ -15,8 +15,8 @@
++ #define RTL8196C 1
++ #define CONFIG_RTL8196C_REVISION_B 1
++ #undef  CONFIG_D8_16
++-#define CONFIG_D16_16 1
++-#undef  CONFIG_D32_16
+++#undef  CONFIG_D16_16
+++#define CONFIG_D32_16 1
++ #undef  CONFIG_D64_16
++ #undef  CONFIG_D128_16
++ #undef  CONFIG_D8_16x2
++Index: config.in.old
++===================================================================
++--- config.in.old	(revision 21164)
+++++ config.in.old	(working copy)
++@@ -73,7 +73,7 @@
++ Dram16M_16Mx1_16bit  CONFIG_D16_16 \
++ Dram32M_32Mx1_16bit  CONFIG_D32_16 \
++ Dram64M_64Mx1_16bit  CONFIG_D64_16 \
++-Dram64M_128Mx1_16bit  CONFIG_D128_16 \
+++Dram128M_128Mx1_16bit  CONFIG_D128_16 \
++ Dram16M_8Mx2_16bit  CONFIG_D8_16x2 \
++ Dram32M_16Mx2_16bit  CONFIG_D16_16x2 \
++ Dram64M_32Mx2_16bit  CONFIG_D32_16x2 \

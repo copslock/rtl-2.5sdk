@@ -1,0 +1,8 @@
+cmd_drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.o := rsdk-linux-gcc -Wp,-MD,drivers/net/rtl819x/rtl865x/../AsicDriver/98/.rtl865x_asicL3.o.d  -nostdinc -isystem /mnt/sdb/netcore_1.3_spi/sdk-store/rtl819x-sdk-v2.5/rtl819x/toolchain/rsdk-1.3.6-5281-EB-2.6.30-0.9.30/bin/../lib/gcc/mips-linux/3.4.6-1.3.6/include -Iinclude  -I/mnt/sdb/netcore_1.3_spi/sdk-store/rtl819x-sdk-v2.5/rtl819x/linux-2.6.30/arch/rlx/include -include include/linux/autoconf.h -D__KERNEL__ -D__ASSEMBLY__ -ffunction-sections  -mno-check-zero-division -mabi=32 -G 0 -mno-abicalls -fno-pic -pipe -msoft-float -ffreestanding -EB -UMIPSEB -U_MIPSEB -U__MIPSEB -U__MIPSEB__ -UMIPSEL -U_MIPSEL -U__MIPSEL -U__MIPSEL__ -DMIPSEB -D_MIPSEB -D__MIPSEB -D__MIPSEB__ -Iinclude/asm-rlx -Iarch/rlx/bsp/ -I/mnt/sdb/netcore_1.3_spi/sdk-store/rtl819x-sdk-v2.5/rtl819x/linux-2.6.30/arch/rlx/include/asm/mach-generic          -O1 -DRTL_TBLDRV -D__linux__  -mno-memcpy -DRTL865X_OVER_KERNEL -DRTL865X_OVER_LINUX -Werror   -c -o drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.o drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.S
+
+deps_drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.o := \
+  drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.S \
+
+drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.o: $(deps_drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.o)
+
+$(deps_drivers/net/rtl819x/rtl865x/../AsicDriver/98/rtl865x_asicL3.o):

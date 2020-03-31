@@ -1,0 +1,8 @@
+Notice:
+	toolchain have moved into ../all-toolchains as a tar file.
+
+So do:
+1. we should copy ../all-toolchains/toolchain.sdk.2.5.tar.gz to ./rtl819x/. 
+2. untar it
+
+then compile follow INSTALL.txt
